@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WpfApp2"
         mc:Ignorable="d"
         Title="MeinCalc!" Height="400" Width="410" ResizeMode="NoResize">
-    <Grid Name="m_grid" ShowGridLines="False" Margin="10">
+    <Grid Name="grid" ShowGridLines="False" Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition />
@@ -24,7 +24,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Name="stp_screen" Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="5" Orientation="Vertical" Margin="3,3,3,0">
-            <TextBox Name="txtbox_screen" Background="GhostWhite" IsReadOnly="True" Height="55" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" 
+            <TextBox Name="screenTextBox" Background="GhostWhite" IsReadOnly="True" Height="55" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" 
                      FontFamily="Consolas" FontSize="30" FontWeight="Bold"/>
             <StackPanel Name="stp_rbtns" Orientation="Horizontal" Height="20" HorizontalAlignment="Right">
                 <RadioButton Name="rbtn_deg" Content="Degrees" IsChecked="True" Margin="5,2,0,0"/>

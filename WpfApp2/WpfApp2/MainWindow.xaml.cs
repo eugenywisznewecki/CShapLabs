@@ -74,10 +74,13 @@ namespace WpfApp2
     {
         public AlterLabel lbl_info = new AlterLabel();
 
-        string _decimal_separator = System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-        bool _allow_operation_fl = false, _clean_lbl_fl = false;
-        Func<double, double, double> _operation = null;
-        double _n;
+        string decimal_separator = System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+        bool isAllowOperationFl = false, isCleanlblFl = false;
+
+        Func<double, double, double> operation = null;
+
+        double n;
 
         public MainWindow()
         {
@@ -90,69 +93,69 @@ namespace WpfApp2
             this.lbl_info.Padding = new Thickness(0);
             this.lbl_info.ContentChanged += OnContentChanged;
 
-            stp_screen.Children.Remove(txtbox_screen);
+            stp_screen.Children.Remove(screenTextBox);
             stp_screen.Children.Remove(stp_rbtns);
             stp_screen.Children.Add(lbl_info);
-            stp_screen.Children.Add(txtbox_screen);
+            stp_screen.Children.Add(screenTextBox);
             stp_screen.Children.Add(stp_rbtns);
 
-            foreach (UIElement _ch in m_grid.Children)
+            foreach (UIElement element in grid.Children)
             {
-                Button _btn = _ch as Button;
-                if (_btn != null)
+                Button button = element as Button;
+                if (button != null)
                 {
-                    _btn.Click += btn_Click;
-                    _btn.Margin = new Thickness(3);
-                    _btn.FontSize = 20;
-                    _btn.FontFamily = new FontFamily("Consolas");
-                    _btn.FontWeight = FontWeights.Bold;
-                    if (_btn.Content.ToString() == "_decimal_separator")
+                    button.Click += onButtonClick;
+                    button.Margin = new Thickness(3);
+                    button.FontSize = 20;
+                    button.FontFamily = new FontFamily("Consolas");
+                    button.FontWeight = FontWeights.Bold;
+                    if (button.Content.ToString() == "_decimal_separator")
                     {
-                        _btn.Content = this._decimal_separator;
+                        button.Content = this.decimal_separator;
                     }
                 }
             }
         }
 
-        private void btn_Click(object sender, EventArgs e)
+        private void onButtonClick(object sender, EventArgs e)
         {
             try
             {
                 String _btn_content = ((Button)sender).Content.ToString();
 
-                if (("0123456789" + this._decimal_separator).Contains(_btn_content))
+                if (("0123456789" + this.decimal_separator).Contains(_btn_content))
                 {
                     AddOperand(_btn_content);
                 }
 
-                if (@"+-*/pownth rt".Contains(_btn_content) && this._allow_operation_fl)
+                if (@"+-*/pownth rt".Contains(_btn_content) && this.isAllowOperationFl)
                 {
                     AddOperation(_btn_content);
                 }
 
-                if (_btn_content == @"+/-" && this._allow_operation_fl)
+                if (_btn_content == @"+/-" && this.isAllowOperationFl)
                 {
                     ChangeSign();
                 }
 
-                if (_btn_content == "=" && this._operation != null && this._allow_operation_fl)
+                if (_btn_content == "=" && this.operation != null && this.isAllowOperationFl)
                 {
                     Calculate();
                 }
 
-                if ("sin(n)cos(n)tg(n)".Contains(_btn_content) && this._allow_operation_fl)
+                if ("sin(n)cos(n)tg(n)".Contains(_btn_content) && this.isAllowOperationFl)
                 {
                     Trigonometric(_btn_content);
                 }
 
-                if (_btn_content == "<-" && txtbox_screen.Text.Length > 0)
+                if (_btn_content == "<-" && screenTextBox.Text.Length > 0)
                 {
                     CleanEntry(1);
                 }
 
-                if (_btn_content == "CE" && txtbox_screen.Text.Length > 0)
+                if (_btn_content == "CE" && screenTextBox.Text.Length > 0)
                 {
-                    CleanEntry(txtbox_screen.Text.Length);
+                    CleanEntry(screenTextBox.Text.Length);
                 }
 
                 if (_btn_content == "CA")
@@ -164,91 +167,91 @@ namespace WpfApp2
             {
                 CleanAll();
                 this.lbl_info.Content = "Overflow Exeption!";
-                this._clean_lbl_fl = true;
+                this.isCleanlblFl = true;
             }
 
             catch (DivideByZeroException)
             {
                 CleanAll();
                 this.lbl_info.Content = "Zero division!";
-                this._clean_lbl_fl = true;
+                this.isCleanlblFl = true;
             }
 
             catch (FormatException)
             {
                 CleanAll();
                 this.lbl_info.Content = "Invalid Operand!";
-                this._clean_lbl_fl = true;
+                this.isCleanlblFl = true;
             }
             catch (InvalidOperationException)
             {
                 CleanAll();
                 this.lbl_info.Content = "Invalid Operand!";
-                this._clean_lbl_fl = true;
+                this.isCleanlblFl = true;
             }
 
         }
 
         private void OnContentChanged(object sender, EventArgs e)
         {
-            if (this._clean_lbl_fl)
+            if (this.isCleanlblFl)
             {
-                ((AlterLabel)sender).Content = txtbox_screen.Text;
-                this._clean_lbl_fl = false;
+                ((AlterLabel)sender).Content = screenTextBox.Text;
+                this.isCleanlblFl = false;
             }
         }
 
-        private void AddOperand(string btn_content)
+        private void AddOperand(string content)
         {
-            if (btn_content == this._decimal_separator)
+            if (content == this.decimal_separator)
             {
-                if (txtbox_screen.Text.Contains(this._decimal_separator) | !this._allow_operation_fl)
+                if (screenTextBox.Text.Contains(this.decimal_separator) | !this.isAllowOperationFl)
                 {
                     return;
                 }
 
-                if (this._allow_operation_fl)
+                if (this.isAllowOperationFl)
                 {
-                    this._allow_operation_fl = false;
+                    this.isAllowOperationFl = false;
                 }
 
             }
             else
             {
-                if (!_allow_operation_fl)
+                if (!isAllowOperationFl)
                 {
-                    this._allow_operation_fl = true;
+                    this.isAllowOperationFl = true;
                 }
             }
 
-            txtbox_screen.Text = txtbox_screen.Text + btn_content;
-            lbl_info.Content = lbl_info.Content + btn_content;
+            screenTextBox.Text = screenTextBox.Text + content;
+            lbl_info.Content = lbl_info.Content + content;
 
             return;
         }
 
-        private void AddOperation(string btn_content)
+        private void AddOperation(string content)
         {
-            if (this._operation == null)
+            if (this.operation == null)
             {
-                this._n = double.Parse(txtbox_screen.Text);
+                this.n = double.Parse(screenTextBox.Text);
             }
             else
             {
-                this._n = _operation(this._n, double.Parse(txtbox_screen.Text));
+                this.n = operation(this.n, double.Parse(screenTextBox.Text));
             }
 
-            CleanEntry(txtbox_screen.Text.Length);
+            CleanEntry(screenTextBox.Text.Length);
             string _info = "";
 
-            switch (btn_content)
+            switch (content)
             {
-                case "+": this._operation = BinaryOperations.Additon; _info = _n.ToString() + " + "; break;
-                case "-": this._operation = BinaryOperations.Subtraction; _info = _n.ToString() + " - "; break;
-                case "*": this._operation = BinaryOperations.Multiplication; _info = _n.ToString() + " * "; break;
-                case @"/": this._operation = BinaryOperations.Division; _info = _n.ToString() + @" / "; break;
-                case "nth rt": this._operation = BinaryOperations.NthRoot; _info = String.Format("nth root {0}, n: ", _n); break;
-                case "pow": this._operation = BinaryOperations.Power; _info = String.Format("pow {0}, n: ", _n); break;
+                case "+": this.operation = BinaryOperations.Additon; _info = n.ToString() + " + "; break;
+                case "-": this.operation = BinaryOperations.Subtraction; _info = n.ToString() + " - "; break;
+                case "*": this.operation = BinaryOperations.Multiplication; _info = n.ToString() + " * "; break;
+                case @"/": this.operation = BinaryOperations.Division; _info = n.ToString() + @" / "; break;
+                case "nth rt": this.operation = BinaryOperations.NthRoot; _info = String.Format("nth root {0}, n: ", n); break;
+                case "pow": this.operation = BinaryOperations.Power; _info = String.Format("pow {0}, n: ", n); break;
 
             }
             lbl_info.Content = _info;
@@ -258,21 +261,21 @@ namespace WpfApp2
 
         private void ChangeSign()
         {
-            int _tmp = txtbox_screen.Text.Length;
-            txtbox_screen.Text = (double.Parse(txtbox_screen.Text) * -1).ToString();
-            lbl_info.Content = lbl_info.Content.ToString().Substring(0, lbl_info.Content.ToString().Length - _tmp) + txtbox_screen.Text;
+            int _tmp = screenTextBox.Text.Length;
+            screenTextBox.Text = (double.Parse(screenTextBox.Text) * -1).ToString();
+            lbl_info.Content = lbl_info.Content.ToString().Substring(0, lbl_info.Content.ToString().Length - _tmp) + screenTextBox.Text;
 
             return;
         }
 
         private void Calculate()
         {
-            this._n = _operation(this._n, double.Parse(txtbox_screen.Text));
-            txtbox_screen.Text = this._n.ToString();
-            lbl_info.Content = String.Format("{0} = {1}", lbl_info.Content, _n);
+            this.n = operation(this.n, double.Parse(screenTextBox.Text));
+            screenTextBox.Text = this.n.ToString();
+            lbl_info.Content = String.Format("{0} = {1}", lbl_info.Content, n);
 
-            this._operation = null;
-            this._clean_lbl_fl = true;
+            this.operation = null;
+            this.isCleanlblFl = true;
 
             return;
         }
@@ -280,7 +283,7 @@ namespace WpfApp2
         private void Trigonometric(string btn_content)
         {
             string _info = "r";
-            double operand = double.Parse(txtbox_screen.Text);
+            double operand = double.Parse(screenTextBox.Text);
             double _tmp = operand;
             if (rbtn_deg.IsChecked == true)
             {
@@ -301,14 +304,12 @@ namespace WpfApp2
                 case "cos(n)": _info = "cos" + _info; _tmp = Math.Cos(_tmp); break;
                 case "tg(n)": _info = "tg" + _info; _tmp = Math.Tan(_tmp); break;
             }
-
-            //if n  == NaN;
-
-            txtbox_screen.Text = _tmp.ToString();
+                  
+            screenTextBox.Text = _tmp.ToString();
             lbl_info.Content = String.Format("{0}({1}) = {2}", _info, operand, _tmp);
 
-            this._allow_operation_fl = true;
-            this._clean_lbl_fl = true;
+            this.isAllowOperationFl = true;
+            this.isCleanlblFl = true;
 
             return;
 
@@ -316,22 +317,22 @@ namespace WpfApp2
 
         private void CleanEntry(int _length)
         {
-            if (txtbox_screen.Text.Length == 2 && txtbox_screen.Text[0] == '-')
+            if (screenTextBox.Text.Length == 2 && screenTextBox.Text[0] == '-')
             {
                 _length = 2;
             }
 
-            txtbox_screen.Text = txtbox_screen.Text.Substring(0, txtbox_screen.Text.Length - _length);
+            screenTextBox.Text = screenTextBox.Text.Substring(0, screenTextBox.Text.Length - _length);
             lbl_info.Content = lbl_info.Content.ToString().Substring(0, lbl_info.Content.ToString().Length - _length);
 
 
-            if (txtbox_screen.Text.Length == 0 || txtbox_screen.Text[txtbox_screen.Text.Length - 1].ToString() == this._decimal_separator)
+            if (screenTextBox.Text.Length == 0 || screenTextBox.Text[screenTextBox.Text.Length - 1].ToString() == this.decimal_separator)
             {
-                this._allow_operation_fl = false;
+                this.isAllowOperationFl = false;
             }
             else
             {
-                this._allow_operation_fl = true;
+                this.isAllowOperationFl = true;
             }
 
             return;
@@ -339,9 +340,9 @@ namespace WpfApp2
 
         private void CleanAll()
         {
-            txtbox_screen.Text = "";
+            screenTextBox.Text = "";
             lbl_info.Content = "";
-            this._operation = null;
+            this.operation = null;
         }
 
     }
